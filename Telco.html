@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+	<title>Telco</title>
+	
+	<script src="Grid.js"></script>
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.js"></script>
+	<script type="text/javascript">
+		
+		var gMap = null;
+		var exchangeCount = 0
+		var lastCreatedExchange = null;
+
+
+		function setup() {
+ 			canvas = createCanvas(60*20+20,60*20+20);
+ 			gMap = new Grid(10,10,20,20,60);
+		}
+ 			
+		function draw() {
+		  	background(0);
+		  	gMap.draw(mouseX, mouseY, null,false);
+		  	
+		}
+
+		function mouseClicked () {
+			var cell = gMap.getCellAtMouseXY(mouseX, mouseY);
+			if ( cell != null) {
+				if  ( cell.isExchange() ) {
+					cell.hasExchangeHere(null);
+					exchangeCount--;
+				} else { 
+					if ( exchangeCount < 2) {
+						var exch = new Exchange(cell.cellX, cell.cellY,"ex:"+ cell.cellX +":" + cell.cellY);
+						cell.hasExchangeHere(exch);
+						exchangeCount++;
+
+						if ( lastCreatedExchange != null){
+							var nearExch = lastCreatedExchange.whichIsClosest(exch);
+							gMap.setCustomerNearestExchange ( nearExch);
+						} 
+						lastCreatedExchange = exch;
+					}
+				}
+			}
+		}
+	
+	</script>
+<body>
+
+</body>
+</html>
+
+
