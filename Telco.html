@@ -1,54 +1,114 @@
 <!DOCTYPE html>
 <html>
+
 	<title>Telco</title>
-	
+<head>	
 	<script src="Grid.js"></script>
 	
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.js"></script> 
 	<script type="text/javascript">
 		
+		//src="p5/p5/p5.min.js"
 		var gMap = null;
 		var exchangeCount = 0
 		var lastCreatedExchange = null;
 
-
+		
 		function setup() {
  			canvas = createCanvas(60*20+20,60*20+20);
- 			gMap = new Grid(10,10,20,20,60);
+ 			resetGrid();
+ 			
+		}
+		function getGridMaxX(){
+			var val = getGridMax( 'maxX');
+			if ( val === null){
+				return (0);
+			}
+			return (val.value);
+		}
+		
+		function getGridMaxY(){
+			var val = getGridMax( 'maxY');
+			if ( val === null){
+				return (0);
+			}
+			return (val.value);
+		}
+		
+		function getGridMax ( id_ ){
+			return ( document.getElementById(id_));
+		}
+		
+		function resetGrid ( ) {
+			//alert(getGridMaxX());
+			exchangeCount = 0;
+			 lastCreatedExchange = null;
+			gMap = new Grid(10,10,getGridMaxX(),getGridMaxX(),60);
 		}
  			
 		function draw() {
 		  	background(0);
-		  	gMap.draw(mouseX, mouseY, null,false);
-		  	
+		  	if ( gMap != null ){
+		  		gMap.draw(mouseX, mouseY, null,false);
+		  	}
 		}
 
 		function mouseClicked () {
-			var cell = gMap.getCellAtMouseXY(mouseX, mouseY);
-			if ( cell != null) {
-				if  ( cell.isExchange() ) {
-					cell.hasExchangeHere(null);
-					exchangeCount--;
-				} else { 
-					if ( exchangeCount < 2) {
-						var exch = new Exchange(cell.cellX, cell.cellY,"ex:"+ cell.cellX +":" + cell.cellY);
-						cell.hasExchangeHere(exch);
-						exchangeCount++;
-
-						if ( lastCreatedExchange != null){
-							var nearExch = lastCreatedExchange.whichIsClosest(exch);
-							gMap.setCustomerNearestExchange ( nearExch);
-						} 
-						lastCreatedExchange = exch;
+			if ( gMap != null ){
+				var cell = gMap.getCellAtMouseXY(mouseX, mouseY);
+				//console.log(cell);
+				//console.log(cell.isExchange())
+				if ( cell != null) {
+					if  ( cell.isExchange() ) {
+						// cell already contains an exchange.
+						cell.hasExchangeHere(null);
+						exchangeCount--;
+					} else { 
+						if ( exchangeCount < 2) {
+							// cell doesnt contain an exchange.
+							var exch = new Exchange(cell.cellX, cell.cellY,"ex:"+ cell.cellX +":" + cell.cellY);
+							cell.hasExchangeHere(exch);
+							exchangeCount++;
+	
+							if ( lastCreatedExchange != null){
+								var nearExch = lastCreatedExchange.whichIsClosest(exch);
+								gMap.setCustomerNearestExchange ( nearExch);
+							} 
+							lastCreatedExchange = exch;
+						}
 					}
 				}
 			}
 		}
+		
+		
+		function xy_validation ( id_ , msg_) {
+			var bRet = false;
+			var frmObj = getGridMax( id_ );
+			if ( frmObj != null){
+				var v = frmObj.value;
+				if ( isNaN(v) || v < 0 || v >20 ) {
+					alert(msg_)
+					frmObj.focus();
+				} else {
+					bRet = true;
+				}
+			} else {
+				alert('ASSERT! no object found for id:' + id_);
+			}
+			return (bRet);
+		}
 	
 	</script>
+</head>
 <body>
-
+	<div>
+	 <label>Max No. Cols:</label><input required type="text" id="maxX" value=5 onchange="xy_validation('maxX','validate-x>=0&&<=20');">
+	 <label>Max No. Rows:</label><input required type="text" id="maxY" value=5 onchange="xy_validation('maxY','validate-y>=0&&<=20');">
+	 <button name="redraw" id="b:001" onclick="resetGrid();">redraw</button>
+	 <hr>
+	</div>
 </body>
 </html>
 
-
+　
