@@ -310,7 +310,6 @@ Cell.prototype.draw = function (usersMouseX_, usersMouseY_ , exchanges_ , mClick
            #     ########
             ##   ###### 
                  ### 
-
                */
 var Exchange = function(x_,y_, name_) {
 	this.x = x_;
